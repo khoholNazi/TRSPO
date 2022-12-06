@@ -2,8 +2,6 @@
 #include <iostream>
 #include <mutex>
 #include <ctime>
-#include <vector>
-#include <list>
 
 class A {
 public:
@@ -43,29 +41,24 @@ int main()
 {
     srand(time(0));
     
-    int N = 10 + rand() % 11; // random  count of threads from 10 to 20
-
     A a;
     B b;
-    std::thread* arr = new std::thread();
-  //  std::vector< std::thread>thrVector;
-  //  std::list<std::thread> thrList;
-    for (int n = N/2; n > 0; n--) {
+
+    int N = 10 + rand() % 11; // random  count of threads from 10 to 20
+    auto* arr = new std::thread[N];
+    for (int n = 0; n < N/2; n++) {
         std::thread th(baseFunc_firstHalf,std::ref( a),  std::ref(b));
-        th.join();
-        //thrList.push_back(th);
-        //thrVector.push_back(th);
+        arr[n] = th;
     }
     for (int n = N - (N / 2); n > 0; n--) {
         std::thread th(baseFunc_secondHalf, std::ref( a), std::ref( b));
         th.join();
-        //thrList.push_back(th);
-        //thrVector.push_back(th);
+        arr[n] = th;
     }
 
-   // for (auto& t : thrList) {
-    //    t.join();
-    //}
+    for (auto& t : arr) {
+        t.join();
+    }
 
     std::cout << "resul a: " << a.getA() << std::endl
         << "result b: " << b.getB() << std::endl << "runtime:= " << clock() / 1000.0 << std::endl;
